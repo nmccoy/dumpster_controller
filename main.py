@@ -1,18 +1,18 @@
-# Complete project details at https://RandomNerdTutorials.com
-
 try:
-  import usocket as socket
+    import usocket as socket
 except:
-  import socket
+    import socket
 
-from machine import Pin
+from machine import Pin, WDT
 import network
 
 import esp
+
 esp.osdebug(None)
 
 import gc
 import time
+
 gc.collect()
 
 ssid = "Not My Real Wifi"
@@ -20,14 +20,14 @@ password = "lol"
 
 station = network.WLAN(network.STA_IF)
 
-station.active(True)
-station.connect(ssid, password)
+# station.active(True)
+# station.connect(ssid, password)
 
 # Oops, want to test this when wifi isn't working
-#while station.isconnected() == False:
+# while station.isconnected() == False:
 #  pass
-#print('Connection successful!!')
-#print(station.ifconfig())
+# print('Connection successful!!')
+# print(station.ifconfig())
 
 led = Pin(2, Pin.OUT)
 dumpster = Pin(19, Pin.OUT)
@@ -37,6 +37,11 @@ fire2 = Pin(18, Pin.OUT)
 dumpster.value(1)
 fire_state = False
 
+# enable watchdog with a timeout of 2s
+watchdog = WDT(timeout=2000)
+watchdog.feed()
+
+
 def toggle_fire():
     global fire_state
     new_state = not fire_state
@@ -45,6 +50,8 @@ def toggle_fire():
     fire2(new_state)
     fire_state = new_state
 
+
 while True:
     toggle_fire()
     time.sleep(0.8)
+    watchdog.feed()
