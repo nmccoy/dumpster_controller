@@ -3,8 +3,10 @@ try:
 except:
     import socket
 
-from machine import Pin, WDT
-import network
+from machine import Pin
+import machine
+
+# import network
 
 import esp
 
@@ -15,11 +17,9 @@ import time
 
 gc.collect()
 
-ssid = "Not My Real Wifi"
-password = "lol"
-
-station = network.WLAN(network.STA_IF)
-
+# ssid = "Not My Real Wifi"
+# password = "lol"
+# station = network.WLAN(network.STA_IF)
 # station.active(True)
 # station.connect(ssid, password)
 
@@ -37,8 +37,25 @@ fire2 = Pin(18, Pin.OUT)
 dumpster.value(1)
 fire_state = False
 
+# Was this a watchdog reset?
+if machine.reset_cause() == machine.WDT_RESET:
+    print("Doggy doggy what now?")
+else:
+    print("Something else this time")
+
+# Give me time to interrupt before enabling WDT.
+def give_me_some_time():
+    for _ in range(20):
+        led(True)
+        time.sleep(0.25)
+        led(False)
+        time.sleep(0.25)
+
+
+give_me_some_time()
+
 # enable watchdog with a timeout of 2s
-watchdog = WDT(timeout=2000)
+watchdog = machine.WDT(timeout=2000)
 watchdog.feed()
 
 
